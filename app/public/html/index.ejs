@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список дел</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<h2 class="center-text">Список дел</h2>
+<% if (!user) { %>
+    <p class="center-text">Пожалуйста, авторизуйтесь.</p>
+    <p class="center-text"><a href="/login">Войти</a></p>
+<% } else { %>
+    <form id="addTodoForm" class="form-margin center-text">
+        <input type="text" id="todoText" class="input-padding" placeholder="Введите задачу" required>
+        <button type="submit" class="button">Добавить дело</button>
+    </form>
+    <table id="todoList">
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Текст</th>
+            <th>Имя пользователя</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% todos.forEach(todo => { %>
+            <% if (!todo.users_datum?.is_blocked) { %>
+                <tr data-id="<%= todo.id %>">
+                    <td><%= todo.id %></td>
+                    <td>
+                        <span class="todo-text"><%= todo.text %></span>
+                        <% if (user.id === todo.user_id || isAdmin) { %>
+                            <button class="delete-button" data-id="<% todo.id %>">Удалить</button>
+                            <button class="edit-button" data-id="<%= todo.id %>" data-text="<%= todo.text %>">Изменить</button>
+                        <% } %>
+                    </td>
+                    <td><%= todo.users_datum ? todo.users_datum.username : 'Неизвестно' %></td>
+                </tr>
+            <% } %>
+        <% }); %>
+        </tbody>
+    </table>
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <form id="editForm">
+                <input type="text" id="editText" class="input-full-width" required>
+                <button type="submit" class="button">Сохранить</button>
+                <button type="button" id="cancelEdit" class="button cancel-button">Отмена</button>
+            </form>
+        </div>
+    </div>
+<% } %>
+<script id="userData" type="application/json">
+    <%- JSON.stringify({ id: user?.id, isAdmin: isAdmin, is_blocked: user?.is_blocked }) %>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/scripts.js"></script>
+</body>
+</html>
